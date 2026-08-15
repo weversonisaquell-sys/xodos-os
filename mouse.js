@@ -1,19 +1,14 @@
-/* =========================================================
-   XodosOS - mouse.js
-   Cursor Xodós: transforma toque em trackpad virtual.
-   - 1 dedo: move o cursor (relativo, estilo trackpad).
-   - Segurar parado com 1 dedo: ativa "hold" (mousedown).
-   - Tocar com 2º dedo enquanto segura: arrasta o cursor
-     (estilo "segura com um dedo, arrasta com o outro").
-   - Toque rápido (tap): simula clique no elemento sob o cursor.
-   - Dois taps rápidos no mesmo elemento: simula "dblclick".
-   - Também segue o mouse real (modo desktop/preview),
-     ignorando eventos sintéticos via e.isTrusted.
-   ========================================================= */
 (function () {
   const cursorEl = document.getElementById('xodosCursor');
   const desktop = document.getElementById('desktopArea');
-  if (!cursorEl || !desktop) return;
+  const dbg = document.getElementById('xodosDebug');
+  if (!cursorEl || !desktop) {
+    if (dbg) dbg.textContent = 'ERRO: cursorEl ou desktop nao encontrado';
+    return;
+  }
+
+  function log(msg){ if (dbg) dbg.textContent = msg; }
+  log('mouse.js carregado OK. Toque na tela.');
 
   const TOUCH_SENSITIVITY = 1.35;
   const HOLD_DELAY = 380;
@@ -31,6 +26,7 @@
   let movedPastThreshold = false;
   let hoverEl = null;
   let lastTapTime = 0, lastTapEl = null;
+  let touchCount = 0;
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
@@ -80,6 +76,7 @@
   function doTap() {
     flashClickRing();
     const el = elAtCursor();
+    log('TAP em: ' + (el ? (el.tagName + '.' + el.className) : 'nada') + ' | cx=' + Math.round(cx) + ' cy=' + Math.round(cy));
     dispatchMouse('mousedown', el);
     dispatchMouse('mouseup', el);
     dispatchMouse('click', el);
@@ -98,6 +95,7 @@
   function startHolding() {
     holding = true;
     cursorEl.classList.add('holding');
+    log('HOLD ativado em cx=' + Math.round(cx) + ' cy=' + Math.round(cy));
     dispatchMouse('mousedown');
   }
 
@@ -113,6 +111,8 @@
   }
 
   function onTouchStart(e) {
+    touchCount++;
+    log('touchstart #' + touchCount + ' dedos=' + e.touches.length + ' x=' + Math.round(e.changedTouches[0].clientX) + ' y=' + Math.round(e.changedTouches[0].clientY));
     for (const t of e.changedTouches) {
       if (primaryId === null) {
         primaryId = t.identifier;
@@ -158,6 +158,7 @@
           cy += dy * TOUCH_SENSITIVITY;
           placeCursor();
           updateHover();
+          log('MOVE cx=' + Math.round(cx) + ' cy=' + Math.round(cy) + ' holding=' + holding);
           if (holding) dispatchMouse('mousemove');
         }
       }
