@@ -309,7 +309,6 @@ html, body{
 }
 .install-status{ font-size:9px; color:#a99fd6; text-align:center; }
 
-/* ---------- Firefox: mini navegador funcional ---------- */
 .browser-body{
     display:flex;
     flex-direction:column;
@@ -401,11 +400,7 @@ html, body{
     text-align:center;
 }
 .bp-tile i{ width:18px; height:18px; color:var(--xd-teal); }
-.bp-search{
-    display:flex;
-    gap:6px;
-    margin-bottom:14px;
-}
+.bp-search{ display:flex; gap:6px; margin-bottom:14px; }
 .bp-search input{
     flex:1;
     height:26px;
@@ -462,7 +457,6 @@ html, body{
 .bp-weather-temp{ font-size:26px; font-weight:700; color:#fff; }
 .bp-weather-desc{ font-size:10px; color:#c9c1ec; }
 
-/* ---------- Menu Iniciar ---------- */
 .start-menu{
     position:absolute;
     bottom:calc(var(--taskbar-h) + 4px);
@@ -618,4 +612,29 @@ html, body{
 @keyframes xodos-ripple{
     from{ width:0; height:0; opacity:0.9; }
     to{ width:28px; height:28px; opacity:0; }
-              }
+}
+
+/* ---------- Painel de diagnóstico e faixa de erro ---------- */
+#xodosDebug{
+    font-family:'Space Mono', monospace !important;
+    line-height:1.4;
+    border-bottom:1px solid var(--xd-border);
+    box-shadow:0 2px 10px rgba(0,0,0,0.4);
+    backdrop-filter: blur(6px);
+}
+.xodos-error-banner{
+    position:fixed;
+    top:30px;
+    left:0;
+    right:0;
+    background:linear-gradient(90deg, #7f1d1d, #ef4444);
+    color:#fff;
+    font-family:'Space Mono', monospace;
+    font-size:10px;
+    line-height:1.4;
+    padding:8px 10px;
+    z-index:99999;
+    white-space:pre-wrap;
+    border-bottom:2px solid #fca5a5;
+    box-shadow:0 4px 14px rgba(0,0,0,0.5);
+    }
