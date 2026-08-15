@@ -1,0 +1,6 @@
+{
+  "appId": "com.gabedeveloper.xodosos",
+  "appName": "XodosOS",
+  "webDir": "www",
+  "bundledWebRuntime": false
+}
