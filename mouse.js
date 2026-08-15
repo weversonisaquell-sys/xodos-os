@@ -6,6 +6,7 @@
    - Tocar com 2º dedo enquanto segura: arrasta o cursor
      (estilo "segura com um dedo, arrasta com o outro").
    - Toque rápido (tap): simula clique no elemento sob o cursor.
+   - Dois taps rápidos no mesmo elemento: simula "dblclick".
    - Também segue o mouse real (modo desktop/preview),
      ignorando eventos sintéticos via e.isTrusted.
    ========================================================= */
@@ -14,11 +15,11 @@
   const desktop = document.getElementById('desktopArea');
   if (!cursorEl || !desktop) return;
 
-  // ---- Ajustes ----
-  const TOUCH_SENSITIVITY = 1.35;   // multiplicador do movimento (trackpad)
-  const HOLD_DELAY = 380;           // ms parado até virar "hold" (mousedown)
-  const MOVE_CANCEL_PX = 10;        // px de movimento que cancela hold/tap
+  const TOUCH_SENSITIVITY = 1.35;
+  const HOLD_DELAY = 380;
+  const MOVE_CANCEL_PX = 10;
   const CLICK_RING_MS = 350;
+  const DOUBLE_TAP_MS = 350;
 
   let cx = window.innerWidth / 2;
   let cy = window.innerHeight / 2;
@@ -29,6 +30,7 @@
   let holding = false;
   let movedPastThreshold = false;
   let hoverEl = null;
+  let lastTapTime = 0, lastTapEl = null;
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
@@ -45,7 +47,7 @@
   function updateHover() {
     const el = elAtCursor();
     const target = el
-      ? el.closest('.desktop-icon, .app-item, .start-btn, .store-btn, .taskbar-app, .win-btn')
+      ? el.closest('.desktop-icon, .app-item, .start-btn, .store-btn, .taskbar-app, .win-btn, .resize-handle, .bp-tile, .browser-bookmarks button, .files-grid > div')
       : null;
     if (target !== hoverEl) {
       if (hoverEl) hoverEl.classList.remove('hover');
@@ -70,7 +72,7 @@
 
   function flashClickRing() {
     cursorEl.classList.remove('clicking');
-    void cursorEl.offsetWidth; // força reflow p/ reiniciar a animação
+    void cursorEl.offsetWidth;
     cursorEl.classList.add('clicking');
     setTimeout(() => cursorEl.classList.remove('clicking'), CLICK_RING_MS);
   }
@@ -81,6 +83,16 @@
     dispatchMouse('mousedown', el);
     dispatchMouse('mouseup', el);
     dispatchMouse('click', el);
+
+    const now = Date.now();
+    if (el && el === lastTapEl && (now - lastTapTime) < DOUBLE_TAP_MS) {
+      dispatchMouse('dblclick', el);
+      lastTapTime = 0;
+      lastTapEl = null;
+    } else {
+      lastTapTime = now;
+      lastTapEl = el;
+    }
   }
 
   function startHolding() {
@@ -100,7 +112,6 @@
     if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
   }
 
-  // ---------------- Toque ----------------
   function onTouchStart(e) {
     for (const t of e.changedTouches) {
       if (primaryId === null) {
@@ -142,7 +153,6 @@
           clearHoldTimer();
         }
 
-        // o 1º dedo só move o cursor quando não há um 2º dedo arrastando
         if (secondaryId === null) {
           cx += dx * TOUCH_SENSITIVITY;
           cy += dy * TOUCH_SENSITIVITY;
@@ -172,7 +182,6 @@
         primaryLast = null;
         movedPastThreshold = false;
 
-        // promove o 2º dedo (se houver) a 1º, pra gesto continuar suave
         if (secondaryId !== null) {
           primaryId = secondaryId;
           primaryStart = { x: secondaryLast.x, y: secondaryLast.y };
@@ -185,7 +194,6 @@
     e.preventDefault();
   }
 
-  // ---------------- Mouse real (preview desktop) ----------------
   function onMouseMoveReal(e) {
     if (!e.isTrusted) return;
     cx = e.clientX; cy = e.clientY;
@@ -202,7 +210,6 @@
     flashClickRing();
   }
 
-  // ---------------- Init ----------------
   function init() {
     desktop.style.touchAction = 'none';
     placeCursor();
@@ -226,4 +233,3 @@
     init();
   }
 })();
-            
