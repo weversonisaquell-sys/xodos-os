@@ -202,6 +202,13 @@
   </div>
 
 <script>
+    window.onerror = function(msg, url, line, col, error){
+      var d = document.createElement('div');
+      d.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ef4444;color:#fff;font-size:10px;padding:6px;z-index:99999;white-space:pre-wrap;';
+      d.textContent = 'ERRO: ' + msg + ' (linha ' + line + ')';
+      document.body.appendChild(d);
+    };
+
     lucide.createIcons();
 
     function setVh(){
@@ -436,14 +443,3 @@
         if (!dragEl) return;
         dragEl.style.left = (e.clientX - dx) + 'px';
         dragEl.style.top = (e.clientY - dy) + 'px';
-    }
-    function stopDrag(){
-        if (dragEl){ clampWindowPos(dragEl); dragEl.classList.remove('dragging'); }
-        dragEl = null;
-        document.removeEventListener('mousemove', onDrag);
-        document.removeEventListener('mouseup', stopDrag);
-    }
-
-    function startResize(e, id){
-        const el = document.getElementById(id);
-        if (el.classLis
