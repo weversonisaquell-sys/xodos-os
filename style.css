@@ -1,0 +1,454 @@
+:root{
+    --taskbar-h: 30px;
+    --title-h: 24px;
+    --icon-size: 24px;
+    --font-ui: 11px;
+    --font-title: 12px;
+    --radius: 6px;
+    --vh: 1vh;
+
+    /* Xodós palette */
+    --xd-purple: #7B5CFF;
+    --xd-purple-deep: #4B2FCF;
+    --xd-teal: #00E5C7;
+    --xd-bg: #0B0715;
+    --xd-glass: rgba(20, 14, 38, 0.55);
+    --xd-glass-strong: rgba(20, 14, 38, 0.85);
+    --xd-border: rgba(123, 92, 255, 0.35);
+}
+
+*{ margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body{
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    font-family:'DM Sans', sans-serif;
+    font-size: var(--font-ui);
+    background:var(--xd-bg);
+}
+
+.desktop-area{
+    position:relative;
+    width:100vw;
+    height:calc(var(--vh, 1vh) * 100);
+    overflow:hidden;
+    cursor:none; /* substituído pelo cursor Xodós */
+}
+
+.wallpaper{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    z-index:0;
+    background:
+        radial-gradient(circle at 15% 20%, rgba(123,92,255,0.35), transparent 45%),
+        radial-gradient(circle at 85% 75%, rgba(0,229,199,0.25), transparent 50%),
+        linear-gradient(160deg, #1a0b3d 0%, #2a1263 40%, #0b0715 100%);
+}
+
+/* ---------- Scrollbars ---------- */
+::-webkit-scrollbar{ width:6px; height:6px; }
+::-webkit-scrollbar-track{ background:transparent; }
+::-webkit-scrollbar-thumb{ background:var(--xd-purple); border-radius:4px; }
+
+/* ---------- Desktop icons ---------- */
+.desktop-icon{
+    position:absolute;
+    width:52px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:2px;
+    cursor:none;
+    padding:4px 2px;
+    border-radius: var(--radius);
+    text-align:center;
+    z-index:1;
+    transition: background .12s, box-shadow .12s;
+}
+.desktop-icon:hover, .desktop-icon.hover{
+    background:rgba(123,92,255,0.18);
+    box-shadow:0 0 0 1px var(--xd-border), 0 0 14px rgba(123,92,255,0.25);
+}
+.desktop-icon i{ width:22px; height:22px; filter: drop-shadow(0 0 4px rgba(0,229,199,0.35)); }
+.desktop-icon span{
+    font-size:9px;
+    line-height:1.15;
+    color:#fff;
+    text-shadow:0 1px 2px rgba(0,0,0,0.85);
+    word-break:break-word;
+}
+
+/* ---------- Windows (app windows) ---------- */
+.os-window{
+    position:absolute;
+    border-radius:10px;
+    overflow:hidden;
+    min-width:220px;
+    min-height:150px;
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.55),
+        0 0 0 1px var(--xd-border),
+        0 0 24px rgba(123,92,255,0.18);
+    display:flex;
+    flex-direction:column;
+    z-index:50;
+    border:1px solid rgba(255,255,255,0.06);
+    background: var(--xd-glass);
+    backdrop-filter: blur(14px);
+}
+.os-window.minimized{ display:none; }
+.os-window.focused{
+    box-shadow:
+        0 10px 30px rgba(0,0,0,0.6),
+        0 0 0 1px var(--xd-teal),
+        0 0 30px rgba(0,229,199,0.25);
+}
+
+.win-titlebar{
+    height:var(--title-h);
+    display:flex;
+    align-items:center;
+    padding:0 6px;
+    cursor:none;
+    user-select:none;
+    flex-shrink:0;
+    gap:4px;
+    background: linear-gradient(90deg, var(--xd-purple-deep), #1e1140 70%);
+    color:#fff;
+    border-bottom:1px solid rgba(123,92,255,0.35);
+}
+.win-titlebar span{
+    flex:1;
+    font-size:var(--font-title);
+    font-weight:700;
+    letter-spacing:.2px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.win-btn{
+    width:10px;
+    height:10px;
+    border-radius:50%;
+    border:none;
+    cursor:none;
+    padding:0;
+    box-shadow:0 0 6px currentColor;
+}
+.win-body{ flex:1; overflow:auto; font-size:var(--font-ui); }
+
+/* ---------- Terminal ---------- */
+.terminal-body{
+    background:#0d0620;
+    color:var(--xd-teal);
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    padding:8px;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+}
+.terminal-output{ flex:1; overflow-y:auto; white-space:pre-wrap; word-break:break-all; }
+.terminal-input{ display:flex; align-items:center; gap:4px; margin-top:4px; }
+.terminal-input input{
+    background:transparent;
+    border:none;
+    color:var(--xd-teal);
+    font-family:inherit;
+    font-size:inherit;
+    flex:1;
+    outline:none;
+    caret-color: var(--xd-teal);
+}
+
+/* ---------- Notepad / Files / About bodies ---------- */
+.win-body textarea{
+    width:100%;
+    height:100%;
+    background:transparent;
+    color:#e6e1ff;
+    border:none;
+    resize:none;
+    padding:8px;
+    font-family:'Space Mono', monospace;
+    font-size:11px;
+    outline:none;
+    caret-color: var(--xd-purple);
+}
+.files-grid{ display:flex; flex-wrap:wrap; gap:10px; padding:8px; background:#0d0620; color:#e6e1ff; height:100%; }
+.files-grid > div{ text-align:center; width:56px; padding:4px; border-radius:6px; }
+.files-grid > div:active{ background:rgba(123,92,255,0.25); }
+.files-grid i{ width:26px; height:26px; }
+.files-grid p{ font-size:9px; margin-top:2px; }
+
+.about-body{
+    background: radial-gradient(circle at 50% 0%, rgba(123,92,255,0.25), transparent 60%), #0d0620;
+    color:#e6e1ff;
+    padding:10px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    height:100%;
+}
+.about-title{
+    font-size:15px;
+    font-weight:700;
+    margin-bottom:4px;
+    background:linear-gradient(90deg, var(--xd-purple), var(--xd-teal));
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+}
+.about-desc{ font-size:10px; color:#a99fd6; }
+
+/* ---------- Loja ---------- */
+.store-body{
+    background:#0d0620;
+    height:100%;
+    padding:10px;
+}
+.store-card{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px;
+    border-radius:8px;
+    background:rgba(123,92,255,0.08);
+    border:1px solid var(--xd-border);
+}
+.store-icon{
+    width:36px;
+    height:36px;
+    flex-shrink:0;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:linear-gradient(135deg, #ff9500, #ff5f2e);
+    box-shadow:0 0 12px rgba(255,110,40,0.4);
+}
+.store-icon i{ width:20px; height:20px; color:#fff; }
+.store-info{ flex:1; min-width:0; }
+.store-name{ font-size:11px; font-weight:700; color:#f1edff; }
+.store-tag{ font-size:9px; color:#a99fd6; margin-top:1px; }
+.store-btn{
+    font-size:9.5px;
+    font-weight:600;
+    color:#0b0715;
+    background:linear-gradient(90deg, var(--xd-teal), var(--xd-purple));
+    border:none;
+    border-radius:6px;
+    padding:6px 10px;
+    flex-shrink:0;
+}
+.store-btn-open{
+    background:linear-gradient(90deg, #34d399, var(--xd-teal));
+}
+
+/* ---------- Janela de instalação ---------- */
+.install-window .win-titlebar{ justify-content:center; }
+.install-body{
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    padding:12px;
+    background:#0d0620;
+}
+.install-app-name{ font-size:11px; font-weight:700; color:#f1edff; }
+.install-progress-track{
+    width:100%;
+    height:6px;
+    border-radius:4px;
+    background:rgba(255,255,255,0.08);
+    overflow:hidden;
+}
+.install-progress-fill{
+    height:100%;
+    width:0%;
+    background:linear-gradient(90deg, var(--xd-purple), var(--xd-teal));
+    transition: width .45s ease;
+    box-shadow:0 0 8px rgba(0,229,199,0.5);
+}
+.install-status{ font-size:9px; color:#a99fd6; text-align:center; }
+
+/* ---------- Firefox (placeholder) ---------- */
+.firefox-body{
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    text-align:center;
+    padding:12px;
+    background:#0d0620;
+    color:#e6e1ff;
+    font-size:10.5px;
+}
+.firefox-sub{ color:#a99fd6; font-size:9px; }
+
+/* ---------- Start menu ---------- */
+.start-menu{
+    position:absolute;
+    bottom:calc(var(--taskbar-h) + 4px);
+    left:4px;
+    width:220px;
+    max-height:280px;
+    border-radius:10px;
+    padding:8px;
+    z-index:200;
+    backdrop-filter:blur(20px);
+    background:var(--xd-glass-strong);
+    border:1px solid var(--xd-border);
+    box-shadow:0 0 24px rgba(123,92,255,0.25);
+    display:none;
+    overflow-y:auto;
+}
+.start-menu.open{ display:block; }
+.start-menu p{ font-size:9px; color:var(--xd-teal); margin-bottom:6px; font-weight:700; letter-spacing:0.6px; }
+.app-item{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:6px 8px;
+    border-radius:6px;
+    cursor:none;
+    transition:background 0.12s;
+    font-size:var(--font-ui);
+    color:#f1edff;
+}
+.app-item:hover, .app-item.hover{ background:rgba(123,92,255,0.22); }
+.app-item i{ width:16px; height:16px; }
+
+/* ---------- Taskbar ---------- */
+.taskbar{
+    position:absolute;
+    bottom:0;
+    left:0;
+    right:0;
+    height:var(--taskbar-h);
+    z-index:100;
+    backdrop-filter:blur(16px);
+    background:var(--xd-glass-strong);
+    border-top:1px solid var(--xd-border);
+    display:flex;
+    align-items:center;
+    padding:0 4px;
+    gap:3px;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+.start-btn{
+    width:26px;
+    height:26px;
+    border-radius:6px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:none;
+    transition:background 0.15s;
+    border:none;
+    background:transparent;
+    flex-shrink:0;
+}
+.start-btn:hover, .start-btn.hover{ background:rgba(123,92,255,0.22); }
+.start-btn svg{ width:16px; height:16px; }
+
+.taskbar-app{
+    height:22px;
+    padding:0 8px;
+    border-radius:5px;
+    display:flex;
+    align-items:center;
+    gap:4px;
+    cursor:none;
+    font-size:9.5px;
+    border:none;
+    color:#fff;
+    background:rgba(255,255,255,0.06);
+}
+.taskbar-app.active{
+    background:rgba(0,229,199,0.18);
+    box-shadow:0 0 0 1px rgba(0,229,199,0.4);
+}
+
+.clock{
+    margin-left:auto;
+    font-size:10px;
+    color:var(--xd-teal);
+    padding-right:6px;
+    flex-shrink:0;
+    font-family:'Space Mono', monospace;
+}
+
+/* ================= Xodós cursor ================= */
+.xodos-cursor{
+    position:fixed;
+    top:0;
+    left:0;
+    width:22px;
+    height:22px;
+    pointer-events:none;
+    z-index:9999;
+    filter: drop-shadow(0 0 2px rgba(0,0,0,0.5)) drop-shadow(0 0 6px rgba(123,92,255,0.55));
+    transition: filter .12s ease;
+    will-change: transform;
+}
+.xodos-cursor svg{ display:block; overflow:visible; }
+.xodos-cursor polygon{
+    fill: url(#xodosCursorGrad);
+    stroke: rgba(255,255,255,0.95);
+    stroke-width: 0.9;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+}
+.xodos-cursor.clicking{
+    filter: drop-shadow(0 0 2px rgba(0,0,0,0.5)) drop-shadow(0 0 10px rgba(0,229,199,0.9));
+}
+.xodos-cursor.clicking svg{ transform: scale(0.85); transform-origin: 2px 2px; }
+
+.xodos-cursor.holding{
+    filter: drop-shadow(0 0 2px rgba(0,0,0,0.5)) drop-shadow(0 0 14px rgba(0,229,199,1));
+}
+.xodos-cursor.holding svg{ transform: scale(0.92); transform-origin: 2px 2px; }
+.xodos-cursor .hold-ring{
+    position:absolute;
+    top:2px; left:2px;
+    width:26px; height:26px;
+    border-radius:50%;
+    border:1.5px solid var(--xd-teal);
+    box-shadow:0 0 10px rgba(0,229,199,0.6);
+    transform:translate(-50%,-50%) scale(0.6);
+    opacity:0;
+    transition: opacity .12s, transform .12s;
+}
+.xodos-cursor.holding .hold-ring{
+    opacity:0.9;
+    transform:translate(-50%,-50%) scale(1);
+}
+
+.xodos-cursor .click-ring{
+    position:absolute;
+    top:2px; left:2px;
+    width:0; height:0;
+    border-radius:50%;
+    border:1.5px solid var(--xd-teal);
+    transform:translate(-50%,-50%);
+    opacity:0;
+}
+.xodos-cursor.clicking .click-ring{
+    animation: xodos-ripple .35s ease-out;
+}
+@keyframes xodos-ripple{
+    from{ width:0; height:0; opacity:0.9; }
+    to{ width:28px; height:28px; opacity:0; }
+                  }
+                  
