@@ -201,10 +201,13 @@
     <div class="hold-ring"></div>
   </div>
 
+  <!-- Painel de diagnóstico -->
+  <div id="xodosDebug" style="position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,0.85);color:#0f0;font-family:monospace;font-size:9px;padding:4px;z-index:100000;white-space:pre-wrap;pointer-events:none;"></div>
+
 <script>
     window.onerror = function(msg, url, line, col, error){
       var d = document.createElement('div');
-      d.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ef4444;color:#fff;font-size:10px;padding:6px;z-index:99999;white-space:pre-wrap;';
+      d.style.cssText = 'position:fixed;top:26px;left:0;right:0;background:#ef4444;color:#fff;font-size:10px;padding:6px;z-index:99999;white-space:pre-wrap;';
       d.textContent = 'ERRO: ' + msg + ' (linha ' + line + ')';
       document.body.appendChild(d);
     };
@@ -436,10 +439,4 @@
         dx = e.clientX - dragEl.offsetLeft;
         dy = e.clientY - dragEl.offsetTop;
         bringToFront(id);
-        document.addEventListener('mousemove', onDrag);
-        document.addEventListener('mouseup', stopDrag);
-    }
-    function onDrag(e){
-        if (!dragEl) return;
-        dragEl.style.left = (e.clientX - dx) + 'px';
-        dragEl.style.top = (e.clientY - dy) + 'px';
+        document.add
