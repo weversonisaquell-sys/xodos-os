@@ -41,7 +41,7 @@ jobs:
       - name: Generate icon
         run: |
           npm install -D cordova-res
-          npx cordova-res android --skip-config --resources-directory resources --icon-source "Cat gray and pink cat.jpg"
+          npx cordova-res android --type icon --skip-config --resources-directory resources --icon-source "Cat gray and pink cat.jpg"
           cp -r resources/android/icon/* android/app/src/main/res/
 
       - name: Sync Capacitor
