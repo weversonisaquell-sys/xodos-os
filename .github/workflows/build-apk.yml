@@ -38,6 +38,12 @@ jobs:
       - name: Add Android platform
         run: npx cap add android
 
+      - name: Generate icon
+        run: |
+          npm install -D cordova-res
+          npx cordova-res android --skip-config --resources-directory resources --icon-source "Cat gray and pink cat.jpg"
+          cp -r resources/android/icon/* android/app/src/main/res/
+
       - name: Sync Capacitor
         run: npx cap sync android
 
