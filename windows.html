@@ -10,7 +10,6 @@
 </head>
 <body class="desktop-area" id="desktopArea">
 
-  <!-- Wallpaper: troque o src abaixo pela sua imagem em res:// / assets -->
   <img class="wallpaper" id="wallpaperImg" src="" alt="">
 
   <!-- Ícones da área de trabalho -->
@@ -61,14 +60,18 @@
         <rect x="12" y="12" width="9" height="9" rx="1" fill="#7B5CFF"/>
       </svg>
     </button>
-    <div id="taskbarApps" style="display:flex;gap:3px;"></div>
-    <div class="clock" id="clock"></div>
+    <div id="taskbarApps" style="display:flex;gap:3px;overflow-x:auto;"></div>
+    <div class="clock" id="clock" onclick="toggleClockDate()">
+      <div class="clock-time" id="clockTime"></div>
+      <div class="clock-date" id="clockDate"></div>
+    </div>
   </div>
 
   <!-- Janelas -->
   <div id="win-terminal" class="os-window minimized" style="top:44px;left:40px;width:260px;height:170px;">
     <div class="win-titlebar" data-win="win-terminal">
       <span>Terminal</span>
+      <button class="win-btn win-btn-max" onclick="toggleMaximize('terminal')"></button>
       <button class="win-btn" style="background:#f59e0b;color:#f59e0b" onclick="minimizeWin('terminal')"></button>
       <button class="win-btn" style="background:#ef4444;color:#ef4444" onclick="closeWin('terminal')"></button>
     </div>
@@ -80,34 +83,35 @@
         <input id="termInput" autocomplete="off" onkeydown="if(event.key==='Enter')runCmd()">
       </div>
     </div>
+    <div class="resize-handle" data-win="win-terminal"></div>
   </div>
 
   <div id="win-notepad" class="os-window minimized" style="top:56px;left:70px;width:230px;height:160px;">
     <div class="win-titlebar" data-win="win-notepad">
       <span>Notepad</span>
+      <button class="win-btn win-btn-max" onclick="toggleMaximize('notepad')"></button>
       <button class="win-btn" style="background:#f59e0b;color:#f59e0b" onclick="minimizeWin('notepad')"></button>
       <button class="win-btn" style="background:#ef4444;color:#ef4444" onclick="closeWin('notepad')"></button>
     </div>
-    <div class="win-body">
-      <textarea placeholder="Escreva algo..."></textarea>
+    <div class="win-body" style="position:relative;">
+      <textarea id="notepadArea" placeholder="Escreva algo..." oninput="onNotepadInput()"></textarea>
+      <span class="notepad-status" id="notepadStatus">Salvo</span>
     </div>
+    <div class="resize-handle" data-win="win-notepad"></div>
   </div>
 
   <div id="win-files" class="os-window minimized" style="top:66px;left:50px;width:220px;height:150px;">
     <div class="win-titlebar" data-win="win-files">
       <span>Arquivos</span>
+      <button class="win-btn win-btn-max" onclick="toggleMaximize('files')"></button>
       <button class="win-btn" style="background:#f59e0b;color:#f59e0b" onclick="minimizeWin('files')"></button>
       <button class="win-btn" style="background:#ef4444;color:#ef4444" onclick="closeWin('files')"></button>
     </div>
-    <div class="win-body files-grid">
-      <div><i data-lucide="folder" style="color:#7B5CFF"></i><p>Documentos</p></div>
-      <div><i data-lucide="folder" style="color:#7B5CFF"></i><p>Downloads</p></div>
-      <div><i data-lucide="image" style="color:#00E5C7"></i><p>Imagens</p></div>
-      <div><i data-lucide="music" style="color:#a78bfa"></i><p>Músicas</p></div>
-    </div>
+    <div class="win-body files-grid" id="filesGrid"></div>
+    <div class="resize-handle" data-win="win-files"></div>
   </div>
 
-  <div id="win-about" class="os-window minimized" style="top:76px;left:90px;width:200px;height:120px;">
+  <div id="win-about" class="os-window minimized" style="top:76px;left:90px;width:200px;height:130px;">
     <div class="win-titlebar" data-win="win-about">
       <span>Sobre</span>
       <button class="win-btn" style="background:#ef4444;color:#ef4444" onclick="closeWin('about')"></button>
@@ -115,12 +119,14 @@
     <div class="win-body about-body">
       <p class="about-title">XodosOS</p>
       <p class="about-desc">Desktop emulator v1.0</p>
+      <p class="about-credit">by GABEDEVELOPER</p>
     </div>
   </div>
 
   <div id="win-store" class="os-window minimized" style="top:40px;left:60px;width:260px;height:200px;">
     <div class="win-titlebar" data-win="win-store">
       <span>Loja</span>
+      <button class="win-btn win-btn-max" onclick="toggleMaximize('store')"></button>
       <button class="win-btn" style="background:#f59e0b;color:#f59e0b" onclick="minimizeWin('store')"></button>
       <button class="win-btn" style="background:#ef4444;color:#ef4444" onclick="closeWin('store')"></button>
     </div>
@@ -137,9 +143,9 @@
         <button class="store-btn store-btn-open" id="storeOpenBtn" onclick="openApp('firefox')" style="display:none">Abrir</button>
       </div>
     </div>
+    <div class="resize-handle" data-win="win-store"></div>
   </div>
 
-  <!-- Janela pequena de instalação -->
   <div id="win-install" class="os-window minimized install-window" style="top:120px;left:110px;width:190px;height:110px;">
     <div class="win-titlebar" data-win="win-install">
       <span>Instalando</span>
@@ -151,20 +157,36 @@
     </div>
   </div>
 
-  <div id="win-firefox" class="os-window minimized" style="top:34px;left:36px;width:260px;height:180px;">
+  <!-- Firefox: mini navegador funcional -->
+  <div id="win-firefox" class="os-window minimized" style="top:34px;left:36px;width:280px;height:220px;">
     <div class="win-titlebar" data-win="win-firefox">
       <span>Firefox</span>
+      <button class="win-btn win-btn-max" onclick="toggleMaximize('firefox')"></button>
       <button class="win-btn" style="background:#f59e0b;color:#f59e0b" onclick="minimizeWin('firefox')"></button>
       <button class="win-btn" style="background:#ef4444;color:#ef4444" onclick="closeWin('firefox')"></button>
     </div>
-    <div class="win-body firefox-body">
-      <i data-lucide="flame" style="width:32px;height:32px;color:#7B5CFF"></i>
-      <p>Firefox ainda não faz nada por aqui.</p>
-      <p class="firefox-sub">Em construção.</p>
+    <div class="win-body browser-body">
+      <div class="browser-toolbar">
+        <button id="brBack" onclick="browserBack()"><i data-lucide="arrow-left"></i></button>
+        <button id="brFwd" onclick="browserForward()"><i data-lucide="arrow-right"></i></button>
+        <button onclick="browserReload()"><i data-lucide="rotate-cw"></i></button>
+        <button onclick="browserNavigate('xodos://home')"><i data-lucide="home"></i></button>
+        <input id="browserUrl" class="browser-url" autocomplete="off" onkeydown="if(event.key==='Enter')browserGo()">
+        <button onclick="browserGo()"><i data-lucide="search"></i></button>
+      </div>
+      <div class="browser-bookmarks" id="browserBookmarks">
+        <button data-page="xodos://home" onclick="browserNavigate('xodos://home')">Início</button>
+        <button data-page="xodos://about" onclick="browserNavigate('xodos://about')">XodosWiki</button>
+        <button data-page="xodos://clima" onclick="browserNavigate('xodos://clima')">Clima</button>
+        <button data-page="xodos://jogos" onclick="browserNavigate('xodos://jogos')">Jogos</button>
+        <button data-page="xodos://dev" onclick="browserNavigate('xodos://dev')">GABEDEVELOPER</button>
+      </div>
+      <div class="browser-page" id="browserPage"></div>
     </div>
+    <div class="resize-handle" data-win="win-firefox"></div>
   </div>
 
-  <!-- Cursor Xodós (roxo -> teal, estilo trackpad) -->
+  <!-- Cursor Xodós -->
   <div class="xodos-cursor" id="xodosCursor">
     <svg width="22" height="22" viewBox="0 0 22 22">
       <defs>
@@ -182,7 +204,6 @@
 <script>
     lucide.createIcons();
 
-    // ---- viewport height fix (webview mobile) ----
     function setVh(){
         document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
     }
@@ -190,17 +211,24 @@
     window.addEventListener('resize', setVh);
     window.addEventListener('orientationchange', setVh);
 
-    // ---- clock ----
     function updateClock(){
         const d = new Date();
-        document.getElementById('clock').textContent = d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+        document.getElementById('clockTime').textContent = d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+        document.getElementById('clockDate').textContent = d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
     }
     updateClock();
     setInterval(updateClock, 1000);
+    function toggleClockDate(){
+        document.getElementById('clock').classList.toggle('show-date');
+    }
 
     // ---- window management ----
     const openWindows = new Set();
     let zIdx = 50;
+    const winIconMap = {
+        terminal: 'terminal', notepad: 'file-text', files: 'folder',
+        store: 'shopping-bag', firefox: 'flame', about: 'info'
+    };
 
     function openWindow(id){
         document.getElementById('win-' + id).classList.remove('minimized');
@@ -209,8 +237,61 @@
         updateTaskbar();
         document.getElementById('startMenu').classList.remove('open');
     }
-    function openApp(id){
-        openWindow(id);
+    function openApp(id){ openWindow(id); }
+
+    function closeWin(id){
+        const el = document.getElementById('win-' + id);
+        el.classList.add('minimized');
+        el.classList.remove('maximized');
+        openWindows.delete(id);
+        updateTaskbar();
+    }
+    function minimizeWin(id){
+        document.getElementById('win-' + id).classList.add('minimized');
+        updateTaskbar();
+    }
+    function bringToFront(elId){
+        document.querySelectorAll('.os-window').forEach(w => w.classList.remove('focused'));
+        const el = document.getElementById(elId);
+        el.style.zIndex = ++zIdx;
+        el.classList.add('focused');
+    }
+
+    function toggleMaximize(id){
+        const el = document.getElementById('win-' + id);
+        bringToFront('win-' + id);
+        if (el.classList.contains('maximized')){
+            el.classList.remove('maximized');
+            el.style.left = el.dataset.prevLeft || el.style.left;
+            el.style.top = el.dataset.prevTop || el.style.top;
+            el.style.width = el.dataset.prevWidth || el.style.width;
+            el.style.height = el.dataset.prevHeight || el.style.height;
+        } else {
+            el.dataset.prevLeft = el.style.left;
+            el.dataset.prevTop = el.style.top;
+            el.dataset.prevWidth = el.style.width;
+            el.dataset.prevHeight = el.style.height;
+            el.classList.add('maximized');
+        }
+    }
+
+    function updateTaskbar(){
+        const c = document.getElementById('taskbarApps');
+        c.innerHTML = '';
+        openWindows.forEach(id => {
+            const win = document.getElementById('win-' + id);
+            const b = document.createElement('button');
+            b.className = 'taskbar-app' + (win.classList.contains('minimized') ? '' : ' active');
+            b.innerHTML = '<i data-lucide="' + (winIconMap[id] || 'square') + '"></i><span>' +
+                id.charAt(0).toUpperCase() + id.slice(1) + '</span>';
+            b.onclick = () => {
+                if (win.classList.contains('minimized')) win.classList.remove('minimized');
+                bringToFront('win-' + id);
+                updateTaskbar();
+            };
+            c.appendChild(b);
+        });
+        lucide.createIcons();
     }
 
     // ---- Loja / instalação de apps ----
@@ -276,47 +357,75 @@
             setTimeout(next, 550);
         })();
     }
-    function closeWin(id){
-        document.getElementById('win-' + id).classList.add('minimized');
-        openWindows.delete(id);
-        updateTaskbar();
+
+    // ---- Notepad com auto-save ----
+    const notepadArea = document.getElementById('notepadArea');
+    let notepadTimer = null;
+    try { notepadArea.value = localStorage.getItem('xodos_notepad') || ''; } catch(e){}
+    function onNotepadInput(){
+        clearTimeout(notepadTimer);
+        notepadTimer = setTimeout(() => {
+            try { localStorage.setItem('xodos_notepad', notepadArea.value); } catch(e){}
+            const status = document.getElementById('notepadStatus');
+            status.classList.add('show');
+            setTimeout(() => status.classList.remove('show'), 1000);
+        }, 400);
     }
-    function minimizeWin(id){
-        document.getElementById('win-' + id).classList.add('minimized');
-        updateTaskbar();
-    }
-    function bringToFront(elId){
-        document.querySelectorAll('.os-window').forEach(w => w.classList.remove('focused'));
-        const el = document.getElementById(elId);
-        el.style.zIndex = ++zIdx;
-        el.classList.add('focused');
+    function openDocument(title, content){
+        notepadArea.value = content;
+        try { localStorage.setItem('xodos_notepad', content); } catch(e){}
+        openWindow('notepad');
     }
 
-    function updateTaskbar(){
-        const c = document.getElementById('taskbarApps');
-        c.innerHTML = '';
-        openWindows.forEach(id => {
-            const win = document.getElementById('win-' + id);
-            const b = document.createElement('button');
-            b.className = 'taskbar-app' + (win.classList.contains('minimized') ? '' : ' active');
-            b.textContent = id.charAt(0).toUpperCase() + id.slice(1);
-            b.onclick = () => {
-                if (win.classList.contains('minimized')) win.classList.remove('minimized');
-                bringToFront('win-' + id);
-                updateTaskbar();
-            };
-            c.appendChild(b);
+    // ---- Arquivos ----
+    const fakeDocs = {
+        'Bem-vindo.txt': 'Bem-vindo ao XodosOS!\n\nEsse sistema roda direto no navegador, com um cursor estilo trackpad feito pra toque.\n\nExplore o Terminal, a Loja e o Firefox pra ver mais.',
+        'Ideias.txt': 'Ideias de projeto:\n- Emulador 8086\n- Jogo planeta gravidade\n- Mod Minecraft com IA\n',
+        'Sobre-mim.txt': 'Criado por GABEDEVELOPER, direto do celular.'
+    };
+    function renderFiles(){
+        const grid = document.getElementById('filesGrid');
+        grid.innerHTML = '';
+        const folders = [
+            {name:'Downloads', icon:'folder', color:'#7B5CFF'},
+            {name:'Imagens', icon:'image', color:'#00E5C7'},
+            {name:'Músicas', icon:'music', color:'#a78bfa'}
+        ];
+        folders.forEach(f => {
+            const d = document.createElement('div');
+            d.innerHTML = '<i data-lucide="' + f.icon + '" style="color:' + f.color + '"></i><p>' + f.name + '</p>';
+            grid.appendChild(d);
         });
+        Object.keys(fakeDocs).forEach(name => {
+            const d = document.createElement('div');
+            d.innerHTML = '<i data-lucide="file-text" style="color:#e6e1ff"></i><p>' + name + '</p>';
+            d.onclick = () => openDocument(name, fakeDocs[name]);
+            grid.appendChild(d);
+        });
+        lucide.createIcons();
     }
+    renderFiles();
 
-    // ---- drag de janelas ----
-    // Reage só a eventos de mouse: reais (mouse de verdade) ou sintéticos
-    // (disparados pelo cursor Xodós no gesto "segura com um dedo, arrasta com o outro").
-    // Nenhum listener de touch aqui — arrastar janela sempre passa pelo cursor virtual.
+    // ---- drag / resize de janelas ----
     let dragEl = null, dx = 0, dy = 0;
+    let resizeEl = null, resizeStartX = 0, resizeStartY = 0, resizeStartW = 0, resizeStartH = 0;
+
+    function clampWindowPos(el){
+        const minVisible = 40;
+        const maxLeft = window.innerWidth - minVisible;
+        const maxTop = window.innerHeight - parseInt(getComputedStyle(document.documentElement).getPropertyValue('--taskbar-h')) - 20;
+        let left = parseFloat(el.style.left) || 0;
+        let top = parseFloat(el.style.top) || 0;
+        left = Math.min(Math.max(left, -(el.offsetWidth - minVisible)), maxLeft);
+        top = Math.min(Math.max(top, 0), maxTop);
+        el.style.left = left + 'px';
+        el.style.top = top + 'px';
+    }
 
     function startDrag(e, id){
+        if (document.getElementById(id).classList.contains('maximized')) return;
         dragEl = document.getElementById(id);
+        dragEl.classList.add('dragging');
         dx = e.clientX - dragEl.offsetLeft;
         dy = e.clientY - dragEl.offsetTop;
         bringToFront(id);
@@ -329,51 +438,12 @@
         dragEl.style.top = (e.clientY - dy) + 'px';
     }
     function stopDrag(){
+        if (dragEl){ clampWindowPos(dragEl); dragEl.classList.remove('dragging'); }
         dragEl = null;
         document.removeEventListener('mousemove', onDrag);
         document.removeEventListener('mouseup', stopDrag);
     }
 
-    document.querySelectorAll('.win-titlebar').forEach(tb => {
-        tb.addEventListener('mousedown', e => startDrag(e, tb.dataset.win));
-    });
-
-    // ---- start menu ----
-    function toggleStart(){
-        document.getElementById('startMenu').classList.toggle('open');
-    }
-    document.addEventListener('click', e => {
-        if (!e.target.closest('.start-btn') && !e.target.closest('.start-menu')) {
-            document.getElementById('startMenu').classList.remove('open');
-        }
-    });
-
-    // ---- terminal ----
-    function runCmd(){
-        const inp = document.getElementById('termInput');
-        const out = document.getElementById('termOutput');
-        const cmd = inp.value.trim();
-        inp.value = '';
-        out.textContent += '$ ' + cmd + '\n';
-        if (cmd === 'help') out.textContent += 'Comandos: help, date, clear, echo <msg>, whoami, uname\n';
-        else if (cmd === 'date') out.textContent += new Date().toLocaleString('pt-BR') + '\n';
-        else if (cmd === 'clear') out.textContent = '';
-        else if (cmd.startsWith('echo ')) out.textContent += cmd.slice(5) + '\n';
-        else if (cmd === 'whoami') out.textContent += 'user\n';
-        else if (cmd === 'uname') out.textContent += 'XodosOS 1.0 (Linux/Windows Hybrid)\n';
-        else if (cmd) out.textContent += 'comando não encontrado: ' + cmd + '\n';
-        out.scrollTop = out.scrollHeight;
-    }
-
-    // =========================================================
-    // Cursor Xodós: toda a lógica de mouse/toque agora vive em mouse.js
-    // =========================================================
-
-    // ---- restaura apps já instalados (persistido via localStorage) ----
-    if (installed.firefox) addDesktopIcon('firefox');
-    renderStoreCard();
-</script>
-<script src="mouse.js"></script>
-</body>
-                                                                                                       </html>
-  
+    function startResize(e, id){
+        const el = document.getElementById(id);
+        if (el.classLis
