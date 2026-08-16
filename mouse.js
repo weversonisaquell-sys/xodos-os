@@ -1,20 +1,24 @@
+/* =========================================================
+   XodosOS - mouse.js
+   Cursor Xodós: transforma toque em trackpad virtual.
+   - 1 dedo: move o cursor (relativo, estilo trackpad).
+   - Segurar parado com 1 dedo: ativa "hold" (mousedown).
+   - Tocar com 2º dedo enquanto segura: arrasta o cursor.
+   - Toque rápido (tap): simula clique no elemento sob o cursor.
+   - Elementos com .upload-btn ou input[type=file] usam o
+     toque real do navegador, pois cliques sintéticos não
+     conseguem abrir o seletor de arquivos por segurança do SO.
+   - Também segue o mouse real (modo desktop/preview).
+   ========================================================= */
 (function () {
   const cursorEl = document.getElementById('xodosCursor');
   const desktop = document.getElementById('desktopArea');
-  const dbg = document.getElementById('xodosDebug');
-  if (!cursorEl || !desktop) {
-    if (dbg) dbg.textContent = 'ERRO: cursorEl ou desktop nao encontrado';
-    return;
-  }
-
-  function log(msg){ if (dbg) dbg.textContent = msg; }
-  log('mouse.js carregado OK. Toque na tela.');
+  if (!cursorEl || !desktop) return;
 
   const TOUCH_SENSITIVITY = 1.35;
   const HOLD_DELAY = 380;
   const MOVE_CANCEL_PX = 10;
   const CLICK_RING_MS = 350;
-  const DOUBLE_TAP_MS = 350;
 
   let cx = window.innerWidth / 2;
   let cy = window.innerHeight / 2;
@@ -25,8 +29,7 @@
   let holding = false;
   let movedPastThreshold = false;
   let hoverEl = null;
-  let lastTapTime = 0, lastTapEl = null;
-  let touchCount = 0;
+  let bypassActive = false;
 
   function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
@@ -43,7 +46,7 @@
   function updateHover() {
     const el = elAtCursor();
     const target = el
-      ? el.closest('.desktop-icon, .app-item, .start-btn, .store-btn, .taskbar-app, .win-btn, .resize-handle, .bp-tile, .browser-bookmarks button, .files-grid > div')
+      ? el.closest('.desktop-icon, .app-item, .start-btn, .store-btn, .taskbar-app, .win-btn, .icon-file, .close-btn, .upload-btn, .fx-shortcut, .browser-nav-btn, .browser-go-btn, .fm-sidebar li, .titlebar')
       : null;
     if (target !== hoverEl) {
       if (hoverEl) hoverEl.classList.remove('hover');
@@ -76,26 +79,14 @@
   function doTap() {
     flashClickRing();
     const el = elAtCursor();
-    log('TAP em: ' + (el ? (el.tagName + '.' + el.className) : 'nada') + ' | cx=' + Math.round(cx) + ' cy=' + Math.round(cy));
     dispatchMouse('mousedown', el);
     dispatchMouse('mouseup', el);
     dispatchMouse('click', el);
-
-    const now = Date.now();
-    if (el && el === lastTapEl && (now - lastTapTime) < DOUBLE_TAP_MS) {
-      dispatchMouse('dblclick', el);
-      lastTapTime = 0;
-      lastTapEl = null;
-    } else {
-      lastTapTime = now;
-      lastTapEl = el;
-    }
   }
 
   function startHolding() {
     holding = true;
     cursorEl.classList.add('holding');
-    log('HOLD ativado em cx=' + Math.round(cx) + ' cy=' + Math.round(cy));
     dispatchMouse('mousedown');
   }
 
@@ -111,8 +102,11 @@
   }
 
   function onTouchStart(e) {
-    touchCount++;
-    log('touchstart #' + touchCount + ' dedos=' + e.touches.length + ' x=' + Math.round(e.changedTouches[0].clientX) + ' y=' + Math.round(e.changedTouches[0].clientY));
+    if (e.target.closest('.upload-btn, input[type=file]')) {
+      bypassActive = true;
+      return;
+    }
+    bypassActive = false;
     for (const t of e.changedTouches) {
       if (primaryId === null) {
         primaryId = t.identifier;
@@ -132,6 +126,7 @@
   }
 
   function onTouchMove(e) {
+    if (bypassActive) return;
     for (const t of e.changedTouches) {
       if (t.identifier === secondaryId) {
         const dx = (t.clientX - secondaryLast.x) * TOUCH_SENSITIVITY;
@@ -158,7 +153,6 @@
           cy += dy * TOUCH_SENSITIVITY;
           placeCursor();
           updateHover();
-          log('MOVE cx=' + Math.round(cx) + ' cy=' + Math.round(cy) + ' holding=' + holding);
           if (holding) dispatchMouse('mousemove');
         }
       }
@@ -167,6 +161,10 @@
   }
 
   function onTouchEnd(e) {
+    if (bypassActive) {
+      bypassActive = false;
+      return;
+    }
     for (const t of e.changedTouches) {
       if (t.identifier === secondaryId) {
         secondaryId = null;
