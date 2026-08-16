@@ -1,442 +1,154 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>XodosOS</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Xodós OS</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-<body class="desktop-area" id="desktopArea">
+<body>
 
-  <img class="wallpaper" id="wallpaperImg" src="" alt="">
+    <!-- Cursor Trackpad Virtual (Xodós) -->
+    <div id="xodosCursor" class="xodos-cursor"></div>
 
-  <!-- Ícones da área de trabalho -->
-  <div class="desktop-icon" style="top:12px;left:12px" onclick="openWindow('terminal')">
-    <i data-lucide="terminal" style="color:#00E5C7"></i>
-    <span>Terminal</span>
-  </div>
-  <div class="desktop-icon" style="top:12px;left:70px" onclick="openWindow('notepad')">
-    <i data-lucide="file-text" style="color:#fff"></i>
-    <span>Notepad</span>
-  </div>
-  <div class="desktop-icon" style="top:12px;left:128px" onclick="openWindow('files')">
-    <i data-lucide="folder" style="color:#7B5CFF"></i>
-    <span>Arquivos</span>
-  </div>
-  <div class="desktop-icon" style="top:12px;left:186px" onclick="openWindow('store')">
-    <i data-lucide="shopping-bag" style="color:#00E5C7"></i>
-    <span>Loja</span>
-  </div>
-
-  <!-- Menu Iniciar -->
-  <div class="start-menu" id="startMenu">
-    <p>APLICATIVOS</p>
-    <div class="app-item" onclick="openWindow('terminal')">
-      <i data-lucide="terminal" style="color:#00E5C7"></i><span>Terminal</span>
-    </div>
-    <div class="app-item" onclick="openWindow('notepad')">
-      <i data-lucide="file-text" style="color:#93c5fd"></i><span>Notepad</span>
-    </div>
-    <div class="app-item" onclick="openWindow('files')">
-      <i data-lucide="folder" style="color:#7B5CFF"></i><span>Arquivos</span>
-    </div>
-    <div class="app-item" onclick="openWindow('store')">
-      <i data-lucide="shopping-bag" style="color:#00E5C7"></i><span>Loja</span>
-    </div>
-    <div class="app-item" onclick="openWindow('about')">
-      <i data-lucide="info" style="color:#a78bfa"></i><span>Sobre</span>
-    </div>
-  </div>
-
-  <!-- Barra de tarefas -->
-  <div class="taskbar">
-    <button class="start-btn" onclick="toggleStart()" aria-label="Menu Iniciar">
-      <svg viewBox="0 0 22 22">
-        <rect x="1" y="1" width="9" height="9" rx="1" fill="#7B5CFF"/>
-        <rect x="12" y="1" width="9" height="9" rx="1" fill="#00E5C7"/>
-        <rect x="1" y="12" width="9" height="9" rx="1" fill="#00E5C7"/>
-        <rect x="12" y="12" width="9" height="9" rx="1" fill="#7B5CFF"/>
-      </svg>
-    </button>
-    <div id="taskbarApps" style="display:flex;gap:3px;overflow-x:auto;"></div>
-    <div class="clock" id="clock" onclick="toggleClockDate()">
-      <div class="clock-time" id="clockTime"></div>
-      <div class="clock-date" id="clockDate"></div>
-    </div>
-  </div>
-
-  <!-- Janelas -->
-  <div id="win-terminal" class="os-window minimized" style="top:44px;left:40px;width:260px;height:170px;">
-    <div class="win-titlebar" data-win="win-terminal">
-      <span>Terminal</span>
-      <button class="win-btn win-btn-max" onclick="toggleMaximize('terminal')"></button>
-      <button class="win-btn" style="background:#f59e0b;color:#f59e0b" onclick="minimizeWin('terminal')"></button>
-      <button class="win-btn" style="background:#ef4444;color:#ef4444" onclick="closeWin('terminal')"></button>
-    </div>
-    <div class="win-body terminal-body">
-      <div class="terminal-output" id="termOutput">user@xodos:~$ Bem-vindo! Digite "help" para comandos.
-</div>
-      <div class="terminal-input">
-        <span style="color:#00E5C7">$</span>
-        <input id="termInput" autocomplete="off" onkeydown="if(event.key==='Enter')runCmd()">
-      </div>
-    </div>
-    <div class="resize-handle" data-win="win-terminal"></div>
-  </div>
-
-  <div id="win-notepad" class="os-window minimized" style="top:56px;left:70px;width:230px;height:160px;">
-    <div class="win-titlebar" data-win="win-notepad">
-      <span>Notepad</span>
-      <button class="win-btn win-btn-max" onclick="toggleMaximize('notepad')"></button>
-      <button class="win-btn" style="background:#f59e0b;color:#f59e0b" onclick="minimizeWin('notepad')"></button>
-      <button class="win-btn" style="background:#ef4444;color:#ef4444" onclick="closeWin('notepad')"></button>
-    </div>
-    <div class="win-body" style="position:relative;">
-      <textarea id="notepadArea" placeholder="Escreva algo..." oninput="onNotepadInput()"></textarea>
-      <span class="notepad-status" id="notepadStatus">Salvo</span>
-    </div>
-    <div class="resize-handle" data-win="win-notepad"></div>
-  </div>
-
-  <div id="win-files" class="os-window minimized" style="top:66px;left:50px;width:220px;height:150px;">
-    <div class="win-titlebar" data-win="win-files">
-      <span>Arquivos</span>
-      <button class="win-btn win-btn-max" onclick="toggleMaximize('files')"></button>
-      <button class="win-btn" style="background:#f59e0b;color:#f59e0b" onclick="minimizeWin('files')"></button>
-      <button class="win-btn" style="background:#ef4444;color:#ef4444" onclick="closeWin('files')"></button>
-    </div>
-    <div class="win-body files-grid" id="filesGrid"></div>
-    <div class="resize-handle" data-win="win-files"></div>
-  </div>
-
-  <div id="win-about" class="os-window minimized" style="top:76px;left:90px;width:200px;height:130px;">
-    <div class="win-titlebar" data-win="win-about">
-      <span>Sobre</span>
-      <button class="win-btn" style="background:#ef4444;color:#ef4444" onclick="closeWin('about')"></button>
-    </div>
-    <div class="win-body about-body">
-      <p class="about-title">XodosOS</p>
-      <p class="about-desc">Desktop emulator v1.0</p>
-      <p class="about-credit">by GABEDEVELOPER</p>
-    </div>
-  </div>
-
-  <div id="win-store" class="os-window minimized" style="top:40px;left:60px;width:260px;height:200px;">
-    <div class="win-titlebar" data-win="win-store">
-      <span>Loja</span>
-      <button class="win-btn win-btn-max" onclick="toggleMaximize('store')"></button>
-      <button class="win-btn" style="background:#f59e0b;color:#f59e0b" onclick="minimizeWin('store')"></button>
-      <button class="win-btn" style="background:#ef4444;color:#ef4444" onclick="closeWin('store')"></button>
-    </div>
-    <div class="win-body store-body">
-      <div class="store-card">
-        <div class="store-icon">
-          <i data-lucide="flame"></i>
+    <!-- Área de Trabalho -->
+    <div class="desktop" id="desktopArea" onclick="Apps.closeStartMenu()">
+        <div class="desktop-icon" onclick="Apps.open('files')">
+            <span class="icon-emoji">📁</span>
+            <span>Arquivos</span>
         </div>
-        <div class="store-info">
-          <p class="store-name">Firefox</p>
-          <p class="store-tag">Navegador</p>
+        <div class="desktop-icon" onclick="Apps.open('firefox')">
+            <span class="icon-emoji">🌐</span>
+            <span>Firefox</span>
         </div>
-        <button class="store-btn" id="storeInstallBtn" onclick="startInstall('firefox')">Instalar</button>
-        <button class="store-btn store-btn-open" id="storeOpenBtn" onclick="openApp('firefox')" style="display:none">Abrir</button>
-      </div>
+        <div class="desktop-icon" onclick="Apps.open('youtube')">
+            <span class="icon-emoji">▶️</span>
+            <span>YouTube</span>
+        </div>
+        <div class="desktop-icon" onclick="Apps.open('terminal')">
+            <span class="icon-emoji">💻</span>
+            <span>Terminal</span>
+        </div>
     </div>
-    <div class="resize-handle" data-win="win-store"></div>
-  </div>
 
-  <div id="win-install" class="os-window minimized install-window" style="top:120px;left:110px;width:190px;height:110px;">
-    <div class="win-titlebar" data-win="win-install">
-      <span>Instalando</span>
+    <!-- Menu Iniciar -->
+    <div id="startMenu" class="start-menu hidden">
+        <div class="start-menu-header">
+            <span>🚀 Xodós OS Menu</span>
+        </div>
+        <div class="start-menu-items">
+            <div class="start-item" onclick="Apps.open('files'); Apps.closeStartMenu();">
+                <span>📁</span> <span>Gerenciador de Arquivos</span>
+            </div>
+            <div class="start-item" onclick="Apps.open('firefox'); Apps.closeStartMenu();">
+                <span>🌐</span> <span>Firefox Browser</span>
+            </div>
+            <div class="start-item" onclick="Apps.open('youtube'); Apps.closeStartMenu();">
+                <span>▶️</span> <span>YouTube Player</span>
+            </div>
+            <div class="start-item" onclick="Apps.open('terminal'); Apps.closeStartMenu();">
+                <span>💻</span> <span>Terminal</span>
+            </div>
+        </div>
     </div>
-    <div class="win-body install-body">
-      <p class="install-app-name" id="installAppName">Firefox</p>
-      <div class="install-progress-track"><div class="install-progress-fill" id="installProgressFill"></div></div>
-      <p class="install-status" id="installStatus">Preparando...</p>
+
+    <!-- Janela do Gerenciador de Arquivos -->
+    <div id="win-files" class="win minimized" style="width: 620px; height: 400px; top: 30px; left: 40px;">
+        <div class="titlebar" data-win="win-files">
+            <span>Gerenciador de Arquivos</span>
+            <div style="display:flex; gap:6px; align-items:center;">
+                <label class="upload-btn" title="Selecionar pastas/arquivos do celular">
+                    📁 Abrir Pasta/Arquivos
+                    <input type="file" id="realFilesInput" multiple webkitdirectory directory style="display:none" onchange="Apps.loadDirectory(event)">
+                </label>
+                <button class="close-btn" onclick="Apps.close('files')"></button>
+            </div>
+        </div>
+        <div class="win-content">
+            <div class="fm-path-bar">
+                <span id="currentPathDisplay">/storage/emulated/0/</span>
+            </div>
+            <div class="fm-layout">
+                <div class="fm-sidebar">
+                    <p class="sidebar-title">ATALHOS</p>
+                    <ul>
+                        <li onclick="Apps.resetFileView()">🏠 Raiz</li>
+                    </ul>
+                </div>
+                <div class="fm-main" id="fileManagerGrid">
+                    <p style="padding:10px">Selecione uma pasta para ver o conteúdo.</p>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
 
-  <!-- Firefox: mini navegador funcional -->
-  <div id="win-firefox" class="os-window minimized" style="top:34px;left:36px;width:280px;height:220px;">
-    <div class="win-titlebar" data-win="win-firefox">
-      <span>Firefox</span>
-      <button class="win-btn win-btn-max" onclick="toggleMaximize('firefox')"></button>
-      <button class="win-btn" style="background:#f59e0b;color:#f59e0b" onclick="minimizeWin('firefox')"></button>
-      <button class="win-btn" style="background:#ef4444;color:#ef4444" onclick="closeWin('firefox')"></button>
+    <!-- Janela de Visualização de Imagens -->
+    <div id="win-photo-viewer" class="win minimized" style="width: 500px; height: 380px; top: 60px; left: 100px;">
+        <div class="titlebar" data-win="win-photo-viewer">
+            <span>Visualizador de Imagens</span>
+            <button class="close-btn" onclick="Apps.close('photo-viewer')"></button>
+        </div>
+        <div class="win-content" style="background:#000; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            <img id="photoViewerImg" src="" alt="Visualização" style="max-width:100%; max-height:100%; object-fit:contain;">
+        </div>
     </div>
-    <div class="win-body browser-body">
-      <div class="browser-toolbar">
-        <button id="brBack" onclick="browserBack()"><i data-lucide="arrow-left"></i></button>
-        <button id="brFwd" onclick="browserForward()"><i data-lucide="arrow-right"></i></button>
-        <button onclick="browserReload()"><i data-lucide="rotate-cw"></i></button>
-        <button onclick="browserNavigate('xodos://home')"><i data-lucide="home"></i></button>
-        <input id="browserUrl" class="browser-url" autocomplete="off" onkeydown="if(event.key==='Enter')browserGo()">
-        <button onclick="browserGo()"><i data-lucide="search"></i></button>
-      </div>
-      <div class="browser-bookmarks" id="browserBookmarks">
-        <button data-page="xodos://home" onclick="browserNavigate('xodos://home')">Início</button>
-        <button data-page="xodos://about" onclick="browserNavigate('xodos://about')">XodosWiki</button>
-        <button data-page="xodos://clima" onclick="browserNavigate('xodos://clima')">Clima</button>
-        <button data-page="xodos://jogos" onclick="browserNavigate('xodos://jogos')">Jogos</button>
-        <button data-page="xodos://dev" onclick="browserNavigate('xodos://dev')">GABEDEVELOPER</button>
-      </div>
-      <div class="browser-page" id="browserPage"></div>
+
+    <!-- Janela do Navegador (Firefox) -->
+    <div id="win-firefox" class="win minimized" style="width: 700px; height: 480px; top: 30px; left: 60px;">
+        <div class="titlebar" data-win="win-firefox">
+            <span>Firefox Browser</span>
+            <button class="close-btn" onclick="Apps.close('firefox')"></button>
+        </div>
+        <div class="win-content">
+            <div class="browser-toolbar">
+                <button class="browser-nav-btn" onclick="Apps.firefoxHome()">🏠</button>
+                <input type="text" class="browser-url-input" id="browserUrl" placeholder="Pesquisar ou digitar endereço">
+                <button onclick="Apps.navigateBrowser()" class="browser-go-btn">Ir</button>
+            </div>
+            <div id="browserViewport" class="browser-viewport">
+                <div id="firefoxHome" class="firefox-home-page">
+                    <div class="fx-logo">🦊 Firefox</div>
+                    <div class="fx-search-box">
+                        <input type="text" id="fxSearchInput" placeholder="Pesquisar na Web..." onkeydown="if(event.key==='Enter') Apps.searchFx(this.value)">
+                    </div>
+                </div>
+                <iframe id="browserIframe" class="browser-content" style="display:none;" sandbox="allow-scripts allow-same-origin allow-forms allow-popups"></iframe>
+            </div>
+        </div>
     </div>
-    <div class="resize-handle" data-win="win-firefox"></div>
-  </div>
 
-  <!-- Cursor Xodós -->
-  <div class="xodos-cursor" id="xodosCursor">
-    <svg width="22" height="22" viewBox="0 0 22 22">
-      <defs>
-        <linearGradient id="xodosCursorGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stop-color="#7B5CFF"/>
-          <stop offset="100%" stop-color="#00E5C7"/>
-        </linearGradient>
-      </defs>
-      <polygon points="2,2 2,17 7.2,13 15,9.3"/>
-    </svg>
-    <div class="click-ring"></div>
-    <div class="hold-ring"></div>
-  </div>
+    <!-- Janela do YouTube -->
+    <div id="win-youtube" class="win minimized" style="width: 720px; height: 470px; top: 50px; left: 90px;">
+        <div class="titlebar" data-win="win-youtube">
+            <span>YouTube Player</span>
+            <button class="close-btn" onclick="Apps.close('youtube')"></button>
+        </div>
+        <div class="win-content" style="background: #000;">
+            <iframe class="browser-content" src="https://www.youtube.com/embed/jfKfPfyJRdk" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
 
-  <!-- Painel de diagnóstico -->
-  <div id="xodosDebug" style="position:fixed;top:0;left:0;right:0;background:rgba(0,0,0,0.85);color:#0f0;font-family:monospace;font-size:9px;padding:4px;z-index:100000;white-space:pre-wrap;pointer-events:none;"></div>
+    <!-- Janela do Terminal -->
+    <div id="win-terminal" class="win minimized" style="width: 440px; height: 290px; top: 80px; left: 120px;">
+        <div class="titlebar" data-win="win-terminal">
+            <span>Terminal Xodós</span>
+            <button class="close-btn" onclick="Apps.close('terminal')"></button>
+        </div>
+        <div class="win-content terminal-body">
+            <p>Xodós OS v2.4 - Shell Active</p>
+            <p>root@xodos:/storage/emulated/0# _</p>
+        </div>
+    </div>
 
-<script>
-    window.onerror = function(msg, url, line, col, error){
-      var d = document.createElement('div');
-      d.style.cssText = 'position:fixed;top:26px;left:0;right:0;background:#ef4444;color:#fff;font-size:10px;padding:6px;z-index:99999;white-space:pre-wrap;';
-      d.textContent = 'ERRO: ' + msg + ' (linha ' + line + ')';
-      document.body.appendChild(d);
-    };
+    <!-- Barra de Tarefas -->
+    <div class="taskbar">
+        <div class="start-btn" onclick="Apps.toggleStartMenu(event)">Xodós OS</div>
+        <div class="taskbar-apps" id="taskbarApps"></div>
+        <div class="clock" id="clock">00:00</div>
+    </div>
 
-    lucide.createIcons();
-
-    function setVh(){
-        document.documentElement.style.setProperty('--vh', (window.innerHeight * 0.01) + 'px');
-    }
-    setVh();
-    window.addEventListener('resize', setVh);
-    window.addEventListener('orientationchange', setVh);
-
-    function updateClock(){
-        const d = new Date();
-        document.getElementById('clockTime').textContent = d.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
-        document.getElementById('clockDate').textContent = d.toLocaleDateString('pt-BR', {day:'2-digit', month:'2-digit'});
-    }
-    updateClock();
-    setInterval(updateClock, 1000);
-    function toggleClockDate(){
-        document.getElementById('clock').classList.toggle('show-date');
-    }
-
-    // ---- window management ----
-    const openWindows = new Set();
-    let zIdx = 50;
-    const winIconMap = {
-        terminal: 'terminal', notepad: 'file-text', files: 'folder',
-        store: 'shopping-bag', firefox: 'flame', about: 'info'
-    };
-
-    function openWindow(id){
-        document.getElementById('win-' + id).classList.remove('minimized');
-        openWindows.add(id);
-        bringToFront('win-' + id);
-        updateTaskbar();
-        document.getElementById('startMenu').classList.remove('open');
-    }
-    function openApp(id){ openWindow(id); }
-
-    function closeWin(id){
-        const el = document.getElementById('win-' + id);
-        el.classList.add('minimized');
-        el.classList.remove('maximized');
-        openWindows.delete(id);
-        updateTaskbar();
-    }
-    function minimizeWin(id){
-        document.getElementById('win-' + id).classList.add('minimized');
-        updateTaskbar();
-    }
-    function bringToFront(elId){
-        document.querySelectorAll('.os-window').forEach(w => w.classList.remove('focused'));
-        const el = document.getElementById(elId);
-        el.style.zIndex = ++zIdx;
-        el.classList.add('focused');
-    }
-
-    function toggleMaximize(id){
-        const el = document.getElementById('win-' + id);
-        bringToFront('win-' + id);
-        if (el.classList.contains('maximized')){
-            el.classList.remove('maximized');
-            el.style.left = el.dataset.prevLeft || el.style.left;
-            el.style.top = el.dataset.prevTop || el.style.top;
-            el.style.width = el.dataset.prevWidth || el.style.width;
-            el.style.height = el.dataset.prevHeight || el.style.height;
-        } else {
-            el.dataset.prevLeft = el.style.left;
-            el.dataset.prevTop = el.style.top;
-            el.dataset.prevWidth = el.style.width;
-            el.dataset.prevHeight = el.style.height;
-            el.classList.add('maximized');
-        }
-    }
-
-    function updateTaskbar(){
-        const c = document.getElementById('taskbarApps');
-        c.innerHTML = '';
-        openWindows.forEach(id => {
-            const win = document.getElementById('win-' + id);
-            const b = document.createElement('button');
-            b.className = 'taskbar-app' + (win.classList.contains('minimized') ? '' : ' active');
-            b.innerHTML = '<i data-lucide="' + (winIconMap[id] || 'square') + '"></i><span>' +
-                id.charAt(0).toUpperCase() + id.slice(1) + '</span>';
-            b.onclick = () => {
-                if (win.classList.contains('minimized')) win.classList.remove('minimized');
-                bringToFront('win-' + id);
-                updateTaskbar();
-            };
-            c.appendChild(b);
-        });
-        lucide.createIcons();
-    }
-
-    // ---- Loja / instalação de apps ----
-    const appNames = { firefox: 'Firefox' };
-    const installed = {};
-    try { installed.firefox = localStorage.getItem('xodos_installed_firefox') === '1'; } catch(e){ installed.firefox = false; }
-
-    function renderStoreCard(){
-        const inst = !!installed.firefox;
-        document.getElementById('storeInstallBtn').style.display = inst ? 'none' : '';
-        document.getElementById('storeOpenBtn').style.display = inst ? '' : 'none';
-    }
-
-    function addDesktopIcon(appId){
-        if (document.getElementById('icon-' + appId)) return;
-        const icon = document.createElement('div');
-        icon.className = 'desktop-icon';
-        icon.id = 'icon-' + appId;
-        icon.style.top = '70px';
-        icon.style.left = '12px';
-        icon.onclick = () => openWindow(appId);
-        icon.innerHTML = '<i data-lucide="flame" style="color:#ff6a2e"></i><span>' + appNames[appId] + '</span>';
-        document.getElementById('desktopArea').appendChild(icon);
-        lucide.createIcons();
-    }
-
-    function startInstall(appId){
-        const steps = [
-            {p:15, label:'Baixando pacote...'},
-            {p:45, label:'Verificando assinatura...'},
-            {p:70, label:'Instalando arquivos...'},
-            {p:90, label:'Configurando atalhos...'},
-            {p:100, label:'Concluído!'}
-        ];
-        const win = document.getElementById('win-install');
-        const fill = document.getElementById('installProgressFill');
-        const status = document.getElementById('installStatus');
-        document.getElementById('installAppName').textContent = appNames[appId] || appId;
-
-        const w = 190, h = 110;
-        win.style.left = Math.max(4, (window.innerWidth - w) / 2) + 'px';
-        win.style.top = Math.max(4, (window.innerHeight - h) / 2) + 'px';
-        win.classList.remove('minimized');
-        bringToFront('win-install');
-        fill.style.width = '0%';
-        status.textContent = 'Preparando...';
-
-        let i = 0;
-        (function next(){
-            if (i >= steps.length){
-                installed[appId] = true;
-                try { localStorage.setItem('xodos_installed_' + appId, '1'); } catch(e){}
-                setTimeout(() => {
-                    win.classList.add('minimized');
-                    addDesktopIcon(appId);
-                    renderStoreCard();
-                }, 500);
-                return;
-            }
-            const step = steps[i++];
-            fill.style.width = step.p + '%';
-            status.textContent = step.label;
-            setTimeout(next, 550);
-        })();
-    }
-
-    // ---- Notepad com auto-save ----
-    const notepadArea = document.getElementById('notepadArea');
-    let notepadTimer = null;
-    try { notepadArea.value = localStorage.getItem('xodos_notepad') || ''; } catch(e){}
-    function onNotepadInput(){
-        clearTimeout(notepadTimer);
-        notepadTimer = setTimeout(() => {
-            try { localStorage.setItem('xodos_notepad', notepadArea.value); } catch(e){}
-            const status = document.getElementById('notepadStatus');
-            status.classList.add('show');
-            setTimeout(() => status.classList.remove('show'), 1000);
-        }, 400);
-    }
-    function openDocument(title, content){
-        notepadArea.value = content;
-        try { localStorage.setItem('xodos_notepad', content); } catch(e){}
-        openWindow('notepad');
-    }
-
-    // ---- Arquivos ----
-    const fakeDocs = {
-        'Bem-vindo.txt': 'Bem-vindo ao XodosOS!\n\nEsse sistema roda direto no navegador, com um cursor estilo trackpad feito pra toque.\n\nExplore o Terminal, a Loja e o Firefox pra ver mais.',
-        'Ideias.txt': 'Ideias de projeto:\n- Emulador 8086\n- Jogo planeta gravidade\n- Mod Minecraft com IA\n',
-        'Sobre-mim.txt': 'Criado por GABEDEVELOPER, direto do celular.'
-    };
-    function renderFiles(){
-        const grid = document.getElementById('filesGrid');
-        grid.innerHTML = '';
-        const folders = [
-            {name:'Downloads', icon:'folder', color:'#7B5CFF'},
-            {name:'Imagens', icon:'image', color:'#00E5C7'},
-            {name:'Músicas', icon:'music', color:'#a78bfa'}
-        ];
-        folders.forEach(f => {
-            const d = document.createElement('div');
-            d.innerHTML = '<i data-lucide="' + f.icon + '" style="color:' + f.color + '"></i><p>' + f.name + '</p>';
-            grid.appendChild(d);
-        });
-        Object.keys(fakeDocs).forEach(name => {
-            const d = document.createElement('div');
-            d.innerHTML = '<i data-lucide="file-text" style="color:#e6e1ff"></i><p>' + name + '</p>';
-            d.onclick = () => openDocument(name, fakeDocs[name]);
-            grid.appendChild(d);
-        });
-        lucide.createIcons();
-    }
-    renderFiles();
-
-    // ---- drag / resize de janelas ----
-    let dragEl = null, dx = 0, dy = 0;
-    let resizeEl = null, resizeStartX = 0, resizeStartY = 0, resizeStartW = 0, resizeStartH = 0;
-
-    function clampWindowPos(el){
-        const minVisible = 40;
-        const maxLeft = window.innerWidth - minVisible;
-        const maxTop = window.innerHeight - parseInt(getComputedStyle(document.documentElement).getPropertyValue('--taskbar-h')) - 20;
-        let left = parseFloat(el.style.left) || 0;
-        let top = parseFloat(el.style.top) || 0;
-        left = Math.min(Math.max(left, -(el.offsetWidth - minVisible)), maxLeft);
-        top = Math.min(Math.max(top, 0), maxTop);
-        el.style.left = left + 'px';
-        el.style.top = top + 'px';
-    }
-
-    function startDrag(e, id){
-        if (document.getElementById(id).classList.contains('maximized')) return;
-        dragEl = document.getElementById(id);
-        dragEl.classList.add('dragging');
-        dx = e.clientX - dragEl.offsetLeft;
-        dy = e.clientY - dragEl.offsetTop;
-        bringToFront(id);
-        document.add
+    <script src="script.js"></script>
+    <script src="apps.js"></script>
+    <script src="mouse.js"></script>
+</body>
+</html>
